@@ -1,0 +1,49 @@
+<html>
+<head>
+    <!-- jQuery의 ajax 기능을 이용하여 한 화면에서 모델 예측 시뮬레이션을
+    처리하겟다 (화면 전환 없이)-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <div>
+        <h2>pgm 파일 업로드(CNN 모델테스트)</h2>
+        <fieldset>
+            <form method='POST' enctype="multipart/form-data">
+                <input type='file' name='pgm' id='fileID'/>
+                <input type='submit' value='업로드'/>
+            </form> 
+            <p id='result'></p>           
+        </fieldset>
+    </div>
+    <script>
+        // html내 요소를 찾기 => $('css selector')
+        $('form').on('submit', (evt)=>{
+            // 이벤트 무효화
+            evt.preventDefault()
+            $('#result').html('')
+            console.log('예측요청')
+            // 서버측에 이미지를 보내서 예측요청을 한다
+            let data = new FormData()
+            data.append( 'pgm', $('#fileID')[0].files[0] )
+            console.log($('#fileID')[0].files[0])
+            $.post({
+                url:'/',     // 파일을 전송할 서버 주소
+                enctype:"multipart/form-data", // 전송타입(파일업로드때만)
+                data:data,   // 파일 첨부
+                processData:false,
+                contentType:false,
+                cache:false,
+                success:( res )=>{ // 통신이 성공하면 이쪽에서 함수호출
+                    console.log( res )
+                    // 결과 화면표시
+                    $('#result').html(`예측결과는 ${res.label}입니다.`)
+                },
+                error:( err )=>{   // 통신 실패하면 이쪽에서 함수 호출
+                    console.log( err )
+                }
+            })
+            return false
+        })
+    </script>    
+</body>
+</html>
